@@ -8,12 +8,12 @@ Since there are two more entities in the game, some rules were added. <br>
 All rules: <br>
 <br>
 - Rock smashes scissors <br>
-- Scissors cuts paper <br>
+- Scissors cut paper <br>
 - Paper wraps rock <br>
 - Rock crushes lizard <br>
 - Lizard poisons Spock <br>
 - Spock breaks scissors <br>
-- Scissors beheads lizard <br>
+- Scissors behead lizard <br>
 - Lizard eats paper <br>
 - Paper refutes Spock <br>
 - Spock vaporizes rock <br>
