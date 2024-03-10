@@ -242,3 +242,46 @@ The "Validate" method posses a logic that regularizes the string parameter by us
 Notice that when the parameter does not match any dictionary key, an ArgumentException is thrown, with the objective of sending an HTTP Bad Request to the user, informing that the choice is invalid. <br>
 Otherwise, if the parameter value matchs the dictionary key, its corresponding Choice enumerator value is returned. <br>
 Moving back to the Controller, after having two Choice variables, it is possible to compare whether they are equal or not. If both choices are equal, a tie is returned right away. This approach avoids redundancy of verification of a tie within the strategy objects.
+<br>
+<br>
+
+# 3.4- Dependency Injection #
+Since it is a .NET 5.0 application (check the note at the section 2 "criteria"), the services and context are injected in the Startup.cs file. <br>
+The application is using the default .NET container and it injects dependencies by using the scoped lifecyle. It means that objects will be new for each request. When the request processing is finished, the object is removed from the memory. <br>
+<br>
+The code bellow shows when GameContext, ValidationService and InitializeChainOfResponsibilityService objects are injected: <br>
+<br>
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddScoped<IValidationService, ValidationService>();
+            services.AddScoped<IGameContext, GameContext>();
+            services.AddScoped<IInitializeChainOfResponsibilityService, InitializeChainOfResponsibilityService>();
+
+            services.AddControllers();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "RockPaperScissorsLizardSpock", Version = "v1" });
+            });
+        }
+```
+
+<br>
+<br>
+
+# 4- How to run #
+The following steps will help you to run the application: <br>
+<br>
+
+1- Make sure that your device supports .NET 5. <br>
+2- Clone this project locally in your computer. <br>
+3- Open the solution file (.sln extension) on Visual Studio. <br>
+4- Click on the "Run" button (probably displayed as "IIS Express" with a green play button icon). <br>
+5- The application uses Swagger. Click on the only documented method. The route should be "/api/v1/Game". Expand this section. <br>
+6- Click on "Try it out" button. <br>
+7- Enter valid Rock-paper-scissors-lizard-spock values for each text field. <br>
+8- Click on "Execute" button. <br>
+
+<br>
+<br>
