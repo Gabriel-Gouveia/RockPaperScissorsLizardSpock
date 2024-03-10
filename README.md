@@ -1,4 +1,4 @@
-# Rock-Paper-Scissors-Spock-Lizard Game on C# #
+# Rock-Paper-Scissors-Lizard-Spock Game on C# #
 
 # 1- Rules #
 The game is similar to rock-paper-scissors. The main difference is that there are two more entities: Spock and lizard. <br>
