@@ -169,6 +169,76 @@ The gameContext object sets the correct strategy, which makes it possible to det
 <br>
 <br>
 
-# 4- Validation #
+# 3.3- Validation #
+You may be asking yourself: "Okay, but what about the case of a tie? What if the players send invalid choices or invalid input parameters?". <br>
+Before all the code I have explained to you so far, the first thing that runs is a validation. Check the full API method inside the controller: <br>
+<br>
 
+```csharp
+public IActionResult Play(string playerOneChoice, string playerTwoChoice)
+        {
+            try
+            {
+                Choice playerOneValidChoice = _validationService.Validate(playerOneChoice);
+                Choice playerTwoValidChoice = _validationService.Validate(playerTwoChoice);
 
+                if (playerOneValidChoice == playerTwoValidChoice)
+                    return Ok("Tie");
+
+                IGameStrategy gameStrategy = _initializeChainOfResponsibilityService.GetFirstHandler().Handle(playerOneValidChoice, playerTwoValidChoice);
+                _gameContext.SetStrategy(gameStrategy);
+                return Ok(_gameContext.DefineWinner(playerOneValidChoice, playerTwoValidChoice));
+            }
+            catch (ArgumentException argEx)
+            {
+                return BadRequest(argEx.Message);
+            }
+            catch (NullReferenceException)
+            {
+                return BadRequest("Invalid choice");
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An internal server error has occurred. Please, try again later.");
+            }
+        }
+```
+<br>
+<br>
+The players' choices are received as two string parameters. The string data type is too much flexible, meaning that the user could input any value. <br>
+To make the choices more strict, I created a Choice enumerator, where the values are ROCK, PAPER, SCISSORS, SPOCK and LIZARD. <br>
+I also created a validation service, which contains a dictionary storing plain strings associated with Choice enumerator's values: <br>
+<br>
+
+```csharp
+public class ValidationService : IValidationService
+    {
+        private readonly Dictionary<string, Choice> _choiceMap;
+
+        public ValidationService()
+        {
+            _choiceMap = new Dictionary<string, Choice>
+            {
+                {"rock", Choice.ROCK},
+                {"paper", Choice.PAPER},
+                {"scissors", Choice.SCISSORS},
+                {"lizard", Choice.LIZARD},
+                {"spock", Choice.SPOCK}
+            };
+        }
+
+        public Choice Validate(string playerChoice)
+        {
+            if (_choiceMap.TryGetValue(playerChoice.Trim().ToLower(), out Choice choice))            
+                return choice;            
+            throw new ArgumentException("Invalid choice");
+        }
+    }
+```
+
+<br>
+<br>
+The validate method posses a logic that regularizes the string parameter by using "Trim" and "ToLower" methods and returns its associated strict Choice value. <br>
+Notice that when the parameter does not match any dictionary key, an ArgumentException is thrown, with the objective of sending an HTTP Bad Request to the user, informing that the choice is invalid. <br>
+Otherwise, if the parameter value matchs the dictionary key, its corresponding Choice enumerator value is returned. <br>
+Moving back to the Controller, after having two Choice variables, it is possible to compare whether they are equal or not. If both choices are equal, a tie is returned right away. This approach avoids redundancy of verification of a tie within the strategy objects.
