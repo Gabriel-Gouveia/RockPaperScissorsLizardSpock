@@ -7,10 +7,12 @@ namespace RockPaperScissorsLizardSpock.Strategies
     {
         public string DefineWinner(Choice playerOneChoice, Choice playerTwoChoice)
         {
+            string result = "Paper refutes Spock.\n";
             if (playerOneChoice == Choice.PAPER)
-                return "Player one is the winner!";
+                result += "Player one is the winner!";
             else 
-                return "Player two is the winner!";
+                result += "Player two is the winner!";
+            return result;
         }
     }
 }
