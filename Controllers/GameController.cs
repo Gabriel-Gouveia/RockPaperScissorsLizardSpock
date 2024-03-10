@@ -32,10 +32,8 @@ namespace RockPaperScissorsLizardSpock.Controllers
             {
                 Choice playerOneValidChoice = _validationService.Validate(playerOneChoice);
                 Choice playerTwoValidChoice = _validationService.Validate(playerTwoChoice);
-
                 if (playerOneValidChoice == playerTwoValidChoice)
                     return Ok("Tie");
-
                 IGameStrategy gameStrategy = _initializeChainOfResponsibilityService.GetFirstHandler().Handle(playerOneValidChoice, playerTwoValidChoice);
                 _gameContext.SetStrategy(gameStrategy);
                 return Ok(_gameContext.DefineWinner(playerOneValidChoice, playerTwoValidChoice));
