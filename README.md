@@ -238,7 +238,7 @@ public class ValidationService : IValidationService
 
 <br>
 <br>
-The validate method posses a logic that regularizes the string parameter by using "Trim" and "ToLower" methods and returns its associated strict Choice value. <br>
+The "Validate" method posses a logic that regularizes the string parameter by using "Trim" and "ToLower" methods and returns its associated strict Choice value. <br>
 Notice that when the parameter does not match any dictionary key, an ArgumentException is thrown, with the objective of sending an HTTP Bad Request to the user, informing that the choice is invalid. <br>
 Otherwise, if the parameter value matchs the dictionary key, its corresponding Choice enumerator value is returned. <br>
 Moving back to the Controller, after having two Choice variables, it is possible to compare whether they are equal or not. If both choices are equal, a tie is returned right away. This approach avoids redundancy of verification of a tie within the strategy objects.
