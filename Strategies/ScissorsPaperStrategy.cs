@@ -7,7 +7,7 @@ namespace RockPaperScissorsLizardSpock.Strategies
     {
         public string DefineWinner(Choice playerOneChoice, Choice playerTwoChoice)
         {
-            string result = "Scissors cuts paper.\n";
+            string result = "Scissors cut paper.\n";
             if (playerOneChoice == Choice.SCISSORS)
                 result += "Player one is the winner!";
             else 
