@@ -4,6 +4,7 @@
 The game is similar to rock-paper-scissors. The main difference is that there are two more entities: Spock and lizard. <br>
 It is a clear reference to The Big Bang Theory series from Warner Bros. It is a nice series. <br>
 Since there are two more entities in the game, some rules were added. <br>
+<br>
 All rules: <br>
 <br>
 - Rock smashes scissors <br>
@@ -95,6 +96,79 @@ public class LizardSpockStrategy : IGameStrategy
 In order to the strategy pattern work, a strategy has to be selected and passed into the Context through the "SetStrategy" method. <br>
 At first, I had thought of a "StrategySelectorService", which would store tuples of choices within a dictionary and a method within this service would select the strategy by reading the choices parameters and checking whether those choices match a tuple from the dictionary or not. However, it didn't work, because the creation of key-value pairs was too much redundant and polluter. <br>
 Afterwards, I thought about one Design Pattern I'm familiar with: **Chain of Responsibility.** <br>
+The Chain of Responsibility pattern chains handler objects that either process the request or send it to their next handler. <br>
+I couldn't think of another way to create a strategies selector. <br>
+In the Chain of Responsibility pattern I implemented, each handler returns a strategy, i.e., each handler is dedicated to select its corresponding strategy. The current handler checks whether both choices, no matter the player, correspond to the handler's strategy or not. <br>
+<br>
+As an example, check the code bellow:
+<br>
+<br>
+
+```csharp
+public class PaperRockHandler : Handler
+    {
+        public override IGameStrategy Handle(Choice playerOneChoice, Choice playerTwoChoice)
+        {
+            if ((playerOneChoice == Choice.PAPER && playerTwoChoice == Choice.ROCK) ||
+                (playerOneChoice == Choice.ROCK && playerTwoChoice == Choice.PAPER))
+            {
+                return new PaperRockStrategy();
+            }
+            else
+                return base.Handle(playerOneChoice, playerTwoChoice);
+        }
+    }
+```
+
+<br>
+The current handler is the "PaperRockHandler". If both players choose "paper" and "rock" choices, then the current handler will return a "PaperRockStrategy" object. Otherwise, if the players' choices do not match what the current handler is expecting, the handler will pass both Choice parameters to the next handler by invoking the "Handle" method from the base Handler. <br>
+Suddenly, I ran into the following issue: where should I point to all next handlers? I need to have the first handler, who will point to its next handler, and the next handler will point to another next handler. Where should I code it? <br>
+For this, the solution I found was to create a service that would have an "entry point" role within the Chain of Responsibility pattern. I named it as "InitializeChainOfResponsibilityService". <br>
+<br>
+<br>
+
+```csharp
+public class InitializeChainOfResponsibilityService : IInitializeChainOfResponsibilityService
+    {
+        private LizardPaperHandler _firstHandler = new LizardPaperHandler();
+
+        public InitializeChainOfResponsibilityService()
+        {
+            _firstHandler.SetNext(new LizardSpockHandler())
+                         .SetNext(new PaperRockHandler())
+                         .SetNext(new PaperSpockHandler())
+                         .SetNext(new RockLizardHandler())
+                         .SetNext(new RockScissorsHandler())
+                         .SetNext(new ScissorsLizardHandler())
+                         .SetNext(new ScissorsPaperHandler())
+                         .SetNext(new SpockRockHandler())
+                         .SetNext(new SpockScissorsHandler());
+        }
+
+        public IHandler GetFirstHandler()
+        {
+            return _firstHandler;
+        }
+    }
+```
+
+<br>
+<br>
+In this service, I hard-coded the first handler by the alphabetical order. Afterwards, I declared a constructor method that would bind all handlers through the "next" pointer. Finally, this service returns the first handler when the "GetFirstHandler" method is invoked.<br> 
+When the "GetFirstHandler" is invoked in the GameController, it returns the first handler. Thereafter, the "Handle" method is invoked right away, which runs the Chain of Responsibility sequence and returns the correct strategy according to the received parameters: <br> 
+<br>
+
+```csharp
+IGameStrategy gameStrategy = _initializeChainOfResponsibilityService.GetFirstHandler().Handle(playerOneValidChoice, playerTwoValidChoice);
+_gameContext.SetStrategy(gameStrategy);
+return Ok(_gameContext.DefineWinner(playerOneValidChoice, playerTwoValidChoice));
+```
+
+<br>
+The gameContext object sets the correct strategy, which makes it possible to determine a winner.
+<br>
+<br>
+
+# 4- Validation #
 
 
-  
